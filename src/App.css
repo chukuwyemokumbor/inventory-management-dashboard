@@ -36,6 +36,10 @@
 .btn:hover {
   background: var(--surface-2);
 }
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+}
 /* ---------- Search & filters ---------- */
 .filters {
   display: flex;

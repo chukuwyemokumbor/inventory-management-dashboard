@@ -1,20 +1,37 @@
 import { useMemo, useState } from 'react'
 import { useInventory } from '../data/useInventory'
-import { formatCurrency, formatNumber } from '../data/format'
+import type { StockStatus } from '../types/inventory'
+import { formatCurrency, formatNumber, stockStatus, STATUS_LABEL } from '../data/format'
 import { InventoryTable } from '../components/InventoryTable'
 
 export function Dashboard() {
   const inv = useInventory()
   const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('all')
+  const [status, setStatus] = useState<'all' | StockStatus>('all')
 
   const units = inv.products.reduce((sum, p) => sum + p.quantity, 0)
   const value = inv.products.reduce((sum, p) => sum + p.quantity * p.unitCost, 0)
 
+  const categories = useMemo(() => [...new Set(inv.products.map((p) => p.category))].sort(), [inv.products])
+
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return inv.products
-    return inv.products.filter((p) => [p.name, p.sku, p.supplier, p.location].some((f) => f.toLowerCase().includes(q)))
-  }, [inv.products, query])
+    return inv.products.filter(
+      (p) =>
+        (category === 'all' || p.category === category) &&
+        (status === 'all' || stockStatus(p) === status) &&
+        (!q || [p.name, p.sku, p.supplier, p.location].some((f) => f.toLowerCase().includes(q))),
+    )
+  }, [inv.products, query, category, status])
+
+  const isFiltered = query !== '' || category !== 'all' || status !== 'all'
+
+  function clearFilters() {
+    setQuery('')
+    setCategory('all')
+    setStatus('all')
+  }
 
   return (
     <div className="page">
@@ -31,6 +48,22 @@ export function Dashboard() {
       </header>
 
       <div className="filters" role="search">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Category">
+          <option value="all">All categories</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <select value={status} onChange={(e) => setStatus(e.target.value as 'all' | StockStatus)} aria-label="Stock status">
+          <option value="all">Any status</option>
+          {(Object.keys(STATUS_LABEL) as StockStatus[]).map((s) => (
+            <option key={s} value={s}>
+              {STATUS_LABEL[s]}
+            </option>
+          ))}
+        </select>
         <input
           type="search"
           placeholder="Search name, SKU, supplier…"
@@ -38,6 +71,11 @@ export function Dashboard() {
           onChange={(e) => setQuery(e.target.value)}
           aria-label="Search products"
         />
+        {isFiltered && (
+          <button type="button" className="btn btn--ghost" onClick={clearFilters}>
+            Clear filters
+          </button>
+        )}
       </div>
 
       <section className="card">
