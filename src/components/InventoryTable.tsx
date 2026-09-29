@@ -16,7 +16,12 @@ const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
   { key: 'status', label: 'Status' },
 ]
 
-export function InventoryTable({ products }: { products: Product[] }) {
+interface Props {
+  products: Product[]
+  onEdit: (p: Product) => void
+}
+
+export function InventoryTable({ products, onEdit }: Props) {
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'status', dir: 1 })
 
   const sorted = [...products].sort((a, b) => {
@@ -59,6 +64,9 @@ export function InventoryTable({ products }: { products: Product[] }) {
                 </button>
               </th>
             ))}
+            <th>
+              <span className="visually-hidden">Actions</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -80,6 +88,11 @@ export function InventoryTable({ products }: { products: Product[] }) {
               <td className="num">{formatCurrency(p.quantity * p.unitCost)}</td>
               <td>
                 <StatusBadge status={stockStatus(p)} />
+              </td>
+              <td className="actions">
+                <button type="button" className="btn btn--small btn--ghost" onClick={() => onEdit(p)}>
+                  Edit
+                </button>
               </td>
             </tr>
           ))}

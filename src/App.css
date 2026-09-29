@@ -53,6 +53,11 @@
   background: transparent;
   border-color: transparent;
 }
+.btn--small {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+}
 /* ---------- Search & filters ---------- */
 .filters {
   display: flex;
@@ -172,6 +177,10 @@ button:focus-visible {
 .cell-meta {
   color: var(--muted);
   font-size: 12px;
+}
+.table .actions {
+  text-align: right;
+  white-space: nowrap;
 }
 .th-sort {
   border: 0;

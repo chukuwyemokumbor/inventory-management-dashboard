@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import type { ProductInput } from '../types/inventory'
+import type { Product, ProductInput } from '../types/inventory'
 import { Modal } from './Modal'
 
 interface Props {
+  /** When set, the dialog edits this product instead of adding a new one. */
+  product?: Product
   categories: string[]
   existingSkus: string[]
   onSave: (input: ProductInput) => void
@@ -21,8 +23,12 @@ const EMPTY: ProductInput = {
   location: '',
 }
 
-export function ProductDialog({ categories, existingSkus, onSave, onClose }: Props) {
-  const [form, setForm] = useState<ProductInput>(EMPTY)
+export function ProductDialog({ product, categories, existingSkus, onSave, onClose }: Props) {
+  const [form, setForm] = useState<ProductInput>(() => {
+    if (!product) return EMPTY
+    const { sku, name, category, quantity, reorderPoint, unitCost, price, supplier, location } = product
+    return { sku, name, category, quantity, reorderPoint, unitCost, price, supplier, location }
+  })
   const [error, setError] = useState<string | null>(null)
 
   const set = <K extends keyof ProductInput>(key: K, value: ProductInput[K]) => setForm((f) => ({ ...f, [key]: value }))
@@ -34,7 +40,7 @@ export function ProductDialog({ categories, existingSkus, onSave, onClose }: Pro
       setError('SKU, name and category are required.')
       return
     }
-    if (existingSkus.includes(sku)) {
+    if (sku !== product?.sku && existingSkus.includes(sku)) {
       setError(`SKU ${sku} already exists.`)
       return
     }
@@ -54,7 +60,7 @@ export function ProductDialog({ categories, existingSkus, onSave, onClose }: Pro
   )
 
   return (
-    <Modal title="Add product" onClose={onClose}>
+    <Modal title={product ? `Edit ${product.name}` : 'Add product'} onClose={onClose}>
       <form className="form" onSubmit={submit}>
         <div className="form__grid">
           <label className="field">
@@ -97,7 +103,7 @@ export function ProductDialog({ categories, existingSkus, onSave, onClose }: Pro
             Cancel
           </button>
           <button type="submit" className="btn btn--primary">
-            Add product
+            {product ? 'Save changes' : 'Add product'}
           </button>
         </div>
       </form>

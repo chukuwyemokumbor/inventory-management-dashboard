@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react'
 import { useInventory } from '../data/useInventory'
-import type { StockStatus } from '../types/inventory'
+import type { Product, StockStatus } from '../types/inventory'
 import { formatCurrency, formatNumber, stockStatus, STATUS_LABEL } from '../data/format'
 import { InventoryTable } from '../components/InventoryTable'
 import { ProductDialog } from '../components/ProductDialog'
+
+type DialogState = { kind: 'add' } | { kind: 'edit'; product: Product } | null
 
 export function Dashboard() {
   const inv = useInventory()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState<'all' | StockStatus>('all')
-  const [adding, setAdding] = useState(false)
+  const [dialog, setDialog] = useState<DialogState>(null)
 
   const units = inv.products.reduce((sum, p) => sum + p.quantity, 0)
   const value = inv.products.reduce((sum, p) => sum + p.quantity * p.unitCost, 0)
@@ -48,7 +50,7 @@ export function Dashboard() {
           <button type="button" className="btn btn--ghost" onClick={inv.resetData}>
             Reset sample data
           </button>
-          <button type="button" className="btn btn--primary" onClick={() => setAdding(true)}>
+          <button type="button" className="btn btn--primary" onClick={() => setDialog({ kind: 'add' })}>
             + Add product
           </button>
         </div>
@@ -90,15 +92,24 @@ export function Dashboard() {
         <p className="card__sub">
           {visible.length} of {inv.products.length} products
         </p>
-        <InventoryTable products={visible} />
+        <InventoryTable products={visible} onEdit={(product) => setDialog({ kind: 'edit', product })} />
       </section>
 
-      {adding && (
+      {dialog?.kind === 'add' && (
         <ProductDialog
           categories={categories}
           existingSkus={inv.products.map((p) => p.sku)}
           onSave={inv.addProduct}
-          onClose={() => setAdding(false)}
+          onClose={() => setDialog(null)}
+        />
+      )}
+      {dialog?.kind === 'edit' && (
+        <ProductDialog
+          product={dialog.product}
+          categories={categories}
+          existingSkus={inv.products.map((p) => p.sku)}
+          onSave={(input) => inv.updateProduct(dialog.product.id, input)}
+          onClose={() => setDialog(null)}
         />
       )}
     </div>
