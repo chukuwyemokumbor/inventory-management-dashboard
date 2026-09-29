@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local API data (created from server/db.seed.json)
+server/db.json

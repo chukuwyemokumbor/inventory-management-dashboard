@@ -51,9 +51,6 @@ export function Dashboard() {
           <p className="page__sub">Stock levels and reorder alerts across all locations</p>
         </div>
         <div className="page__actions">
-          <button type="button" className="btn btn--ghost" onClick={inv.resetData}>
-            Reset sample data
-          </button>
           <button type="button" className="btn btn--primary" onClick={() => setDialog({ kind: 'add' })}>
             + Add product
           </button>
