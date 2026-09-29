@@ -49,6 +49,27 @@ export function InventoryTable({ products, onEdit, onAdjust, onDelete }: Props) 
 
   return (
     <div className="table-wrap">
+      {/* Column headers are hidden on phones, so sorting gets its own control there. */}
+      <div className="mobile-sort">
+        <label>
+          Sort by{' '}
+          <select value={sort.key} onChange={(e) => setSort((s) => ({ ...s, key: e.target.value as SortKey }))}>
+            {COLUMNS.map((c) => (
+              <option key={c.key} value={c.key}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          className="btn btn--small"
+          onClick={() => setSort((s) => ({ ...s, dir: s.dir === 1 ? -1 : 1 }))}
+          aria-label={sort.dir === 1 ? 'Sorted ascending, switch to descending' : 'Sorted descending, switch to ascending'}
+        >
+          {sort.dir === 1 ? '▲ Asc' : '▼ Desc'}
+        </button>
+      </div>
       <table className="table">
         <thead>
           <tr>
@@ -74,21 +95,23 @@ export function InventoryTable({ products, onEdit, onAdjust, onDelete }: Props) 
         <tbody>
           {sorted.map((p) => (
             <tr key={p.id}>
-              <td className="mono">{p.sku}</td>
-              <td>
+              <td className="cell--sku mono">{p.sku}</td>
+              <td className="cell--product">
                 <div className="cell-name">{p.name}</div>
                 <div className="cell-meta">
                   {p.supplier}
                   {p.location && ` · ${p.location}`}
                 </div>
               </td>
-              <td>{p.category}</td>
-              <td className="num">
+              <td className="cell--category">{p.category}</td>
+              <td className="cell--qty num" data-label="On hand">
                 {formatNumber(p.quantity)}
                 <div className="cell-meta">reorder at {formatNumber(p.reorderPoint)}</div>
               </td>
-              <td className="num">{formatCurrency(p.quantity * p.unitCost)}</td>
-              <td>
+              <td className="cell--value num" data-label="Value">
+                {formatCurrency(p.quantity * p.unitCost)}
+              </td>
+              <td className="cell--status">
                 <StatusBadge status={stockStatus(p)} />
               </td>
               <td className="actions">
