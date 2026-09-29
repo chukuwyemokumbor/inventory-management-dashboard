@@ -17,6 +17,10 @@
   font-size: 26px;
   letter-spacing: -0.01em;
 }
+.page__actions {
+  display: flex;
+  gap: 8px;
+}
 .page__sub {
   margin: 2px 0 0;
   color: var(--ink-2);
@@ -35,6 +39,15 @@
 }
 .btn:hover {
   background: var(--surface-2);
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.btn--primary:hover {
+  background: var(--accent);
+  filter: brightness(1.08);
 }
 .btn--ghost {
   background: transparent;
@@ -173,4 +186,54 @@ button:focus-visible {
 .th-sort__arrow {
   font-size: 9px;
   width: 9px;
+}
+
+/* ---------- Modal & forms ---------- */
+.modal {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0;
+  background: var(--surface);
+  color: var(--ink);
+  width: min(560px, calc(100vw - 32px));
+}
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+.modal__body {
+  padding: 22px 24px;
+}
+.modal__title {
+  font-size: 17px;
+  margin-bottom: 16px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.field input {
+  color: var(--ink);
+}
+.form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+.form__error {
+  margin: 0;
+  color: var(--critical-ink);
 }

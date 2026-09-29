@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { Product } from '../types/inventory'
+import type { Product, ProductInput } from '../types/inventory'
 import { createSampleProducts } from './products'
 
 const STORAGE_KEY = 'inventory-dashboard:products'
@@ -30,6 +30,8 @@ export function useInventory() {
 
   return {
     products,
+    addProduct: (input: ProductInput) =>
+      setProducts((prev) => [...prev, { ...input, id: crypto.randomUUID(), updatedAt: new Date().toISOString() }]),
     resetData: () => setProducts(createSampleProducts()),
   }
 }

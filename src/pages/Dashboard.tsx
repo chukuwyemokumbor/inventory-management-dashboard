@@ -3,12 +3,14 @@ import { useInventory } from '../data/useInventory'
 import type { StockStatus } from '../types/inventory'
 import { formatCurrency, formatNumber, stockStatus, STATUS_LABEL } from '../data/format'
 import { InventoryTable } from '../components/InventoryTable'
+import { ProductDialog } from '../components/ProductDialog'
 
 export function Dashboard() {
   const inv = useInventory()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState<'all' | StockStatus>('all')
+  const [adding, setAdding] = useState(false)
 
   const units = inv.products.reduce((sum, p) => sum + p.quantity, 0)
   const value = inv.products.reduce((sum, p) => sum + p.quantity * p.unitCost, 0)
@@ -42,9 +44,14 @@ export function Dashboard() {
             {inv.products.length} products · {formatNumber(units)} units · {formatCurrency(value)} at cost
           </p>
         </div>
-        <button type="button" className="btn" onClick={inv.resetData}>
-          Reset sample data
-        </button>
+        <div className="page__actions">
+          <button type="button" className="btn btn--ghost" onClick={inv.resetData}>
+            Reset sample data
+          </button>
+          <button type="button" className="btn btn--primary" onClick={() => setAdding(true)}>
+            + Add product
+          </button>
+        </div>
       </header>
 
       <div className="filters" role="search">
@@ -85,6 +92,15 @@ export function Dashboard() {
         </p>
         <InventoryTable products={visible} />
       </section>
+
+      {adding && (
+        <ProductDialog
+          categories={categories}
+          existingSkus={inv.products.map((p) => p.sku)}
+          onSave={inv.addProduct}
+          onClose={() => setAdding(false)}
+        />
+      )}
     </div>
   )
 }
