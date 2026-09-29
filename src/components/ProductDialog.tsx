@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import type { Product, ProductInput } from '../types/inventory'
+import { errorMessage } from '../data/api'
 import { Modal } from './Modal'
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
   product?: Product
   categories: string[]
   existingSkus: string[]
-  onSave: (input: ProductInput) => void
+  onSave: (input: ProductInput) => Promise<void>
   onClose: () => void
 }
 
@@ -30,10 +31,11 @@ export function ProductDialog({ product, categories, existingSkus, onSave, onClo
     return { sku, name, category, quantity, reorderPoint, unitCost, price, supplier, location }
   })
   const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const set = <K extends keyof ProductInput>(key: K, value: ProductInput[K]) => setForm((f) => ({ ...f, [key]: value }))
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault()
     const sku = form.sku.trim().toUpperCase()
     if (!sku || !form.name.trim() || !form.category.trim()) {
@@ -48,8 +50,15 @@ export function ProductDialog({ product, categories, existingSkus, onSave, onClo
       setError('Numbers must be zero or greater.')
       return
     }
-    onSave({ ...form, sku, name: form.name.trim(), category: form.category.trim() })
-    onClose()
+    setError(null)
+    setSaving(true)
+    try {
+      await onSave({ ...form, sku, name: form.name.trim(), category: form.category.trim() })
+      onClose()
+    } catch (err) {
+      setError(errorMessage(err))
+      setSaving(false)
+    }
   }
 
   const num = (key: 'quantity' | 'reorderPoint' | 'unitCost' | 'price', label: string, step = '1') => (
@@ -102,8 +111,8 @@ export function ProductDialog({ product, categories, existingSkus, onSave, onClo
           <button type="button" className="btn" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className="btn btn--primary">
-            {product ? 'Save changes' : 'Add product'}
+          <button type="submit" className="btn btn--primary" disabled={saving}>
+            {saving ? 'Saving…' : product ? 'Save changes' : 'Add product'}
           </button>
         </div>
       </form>

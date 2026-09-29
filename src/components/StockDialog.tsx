@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import type { Product } from '../types/inventory'
 import { formatNumber } from '../data/format'
+import { errorMessage } from '../data/api'
 import { Modal } from './Modal'
 
 interface Props {
   product: Product
-  onAdjust: (delta: number) => void
+  onAdjust: (delta: number) => Promise<void>
   onClose: () => void
 }
 
@@ -15,14 +16,23 @@ export function StockDialog({ product, onAdjust, onClose }: Props) {
   const suggested = Math.max(0, product.reorderPoint * 2 - product.quantity)
   const [mode, setMode] = useState<'in' | 'out'>('in')
   const [qty, setQty] = useState(suggested || 1)
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const delta = mode === 'in' ? qty : -Math.min(qty, product.quantity)
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault()
     if (qty <= 0) return
-    onAdjust(delta)
-    onClose()
+    setError(null)
+    setSaving(true)
+    try {
+      await onAdjust(delta)
+      onClose()
+    } catch (err) {
+      setError(errorMessage(err))
+      setSaving(false)
+    }
   }
 
   return (
@@ -56,12 +66,17 @@ export function StockDialog({ product, onAdjust, onClose }: Props) {
           {formatNumber(product.quantity)} on hand → <strong>{formatNumber(product.quantity + delta)}</strong> after this
           change
         </p>
+        {error && (
+          <p className="form__error" role="alert">
+            {error}
+          </p>
+        )}
         <div className="form__actions">
           <button type="button" className="btn" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className="btn btn--primary" disabled={qty <= 0}>
-            Apply
+          <button type="submit" className="btn btn--primary" disabled={qty <= 0 || saving}>
+            {saving ? 'Saving…' : 'Apply'}
           </button>
         </div>
       </form>
