@@ -36,6 +36,27 @@
 .btn:hover {
   background: var(--surface-2);
 }
+/* ---------- Search & filters ---------- */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.filters input[type='search'] {
+  flex: 1 1 220px;
+  max-width: 340px;
+}
+input,
+select {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+input:focus-visible,
+select:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -51,7 +72,10 @@ button:focus-visible {
 }
 .card__title {
   font-size: 15px;
-  margin-bottom: 12px;
+}
+.card__sub {
+  margin: 2px 0 12px;
+  color: var(--ink-2);
 }
 .empty {
   padding: 32px 0;

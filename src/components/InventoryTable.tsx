@@ -38,7 +38,7 @@ export function InventoryTable({ products }: { products: Product[] }) {
 
   const toggle = (key: SortKey) => setSort((s) => (s.key === key ? { key, dir: s.dir === 1 ? -1 : 1 } : { key, dir: 1 }))
 
-  if (products.length === 0) return <div className="empty">No products yet.</div>
+  if (products.length === 0) return <div className="empty">No products match your search.</div>
 
   return (
     <div className="table-wrap">
