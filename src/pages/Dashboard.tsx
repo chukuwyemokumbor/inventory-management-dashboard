@@ -31,6 +31,10 @@ export function Dashboard() {
 
   const isFiltered = query !== '' || category !== 'all' || status !== 'all'
 
+  function handleDelete(p: Product) {
+    if (confirm(`Delete ${p.name} (${p.sku})? This can't be undone.`)) inv.deleteProduct(p.id)
+  }
+
   function clearFilters() {
     setQuery('')
     setCategory('all')
@@ -92,7 +96,11 @@ export function Dashboard() {
         <p className="card__sub">
           {visible.length} of {inv.products.length} products
         </p>
-        <InventoryTable products={visible} onEdit={(product) => setDialog({ kind: 'edit', product })} />
+        <InventoryTable
+          products={visible}
+          onEdit={(product) => setDialog({ kind: 'edit', product })}
+          onDelete={handleDelete}
+        />
       </section>
 
       {dialog?.kind === 'add' && (

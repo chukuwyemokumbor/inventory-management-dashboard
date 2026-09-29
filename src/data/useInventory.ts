@@ -34,6 +34,7 @@ export function useInventory() {
       setProducts((prev) => [...prev, { ...input, id: crypto.randomUUID(), updatedAt: new Date().toISOString() }]),
     updateProduct: (id: string, input: ProductInput) =>
       setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...input, updatedAt: new Date().toISOString() } : p))),
+    deleteProduct: (id: string) => setProducts((prev) => prev.filter((p) => p.id !== id)),
     resetData: () => setProducts(createSampleProducts()),
   }
 }

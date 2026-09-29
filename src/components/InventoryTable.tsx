@@ -19,9 +19,10 @@ const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
 interface Props {
   products: Product[]
   onEdit: (p: Product) => void
+  onDelete: (p: Product) => void
 }
 
-export function InventoryTable({ products, onEdit }: Props) {
+export function InventoryTable({ products, onEdit, onDelete }: Props) {
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'status', dir: 1 })
 
   const sorted = [...products].sort((a, b) => {
@@ -92,6 +93,14 @@ export function InventoryTable({ products, onEdit }: Props) {
               <td className="actions">
                 <button type="button" className="btn btn--small btn--ghost" onClick={() => onEdit(p)}>
                   Edit
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--small btn--ghost btn--danger"
+                  onClick={() => onDelete(p)}
+                  aria-label={`Delete ${p.name}`}
+                >
+                  Delete
                 </button>
               </td>
             </tr>
