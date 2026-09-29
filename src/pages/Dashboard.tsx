@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react'
 import { useInventory } from '../data/useInventory'
 import type { Product, StockStatus } from '../types/inventory'
-import { formatCurrency, formatNumber, stockStatus, STATUS_LABEL } from '../data/format'
+import { stockStatus, STATUS_LABEL } from '../data/format'
 import { InventoryTable } from '../components/InventoryTable'
 import { ProductDialog } from '../components/ProductDialog'
+import { StatTiles } from '../components/StatTiles'
+import { LowStockList } from '../components/LowStockList'
+import { StockDialog } from '../components/StockDialog'
 
-type DialogState = { kind: 'add' } | { kind: 'edit'; product: Product } | null
+type DialogState = { kind: 'add' } | { kind: 'edit'; product: Product } | { kind: 'adjust'; product: Product } | null
 
 export function Dashboard() {
   const inv = useInventory()
@@ -14,20 +17,19 @@ export function Dashboard() {
   const [status, setStatus] = useState<'all' | StockStatus>('all')
   const [dialog, setDialog] = useState<DialogState>(null)
 
-  const units = inv.products.reduce((sum, p) => sum + p.quantity, 0)
-  const value = inv.products.reduce((sum, p) => sum + p.quantity * p.unitCost, 0)
-
   const categories = useMemo(() => [...new Set(inv.products.map((p) => p.category))].sort(), [inv.products])
 
-  const visible = useMemo(() => {
+  // Category + search scope the tiles, alerts and table; status narrows the table only.
+  const scoped = useMemo(() => {
     const q = query.trim().toLowerCase()
     return inv.products.filter(
       (p) =>
         (category === 'all' || p.category === category) &&
-        (status === 'all' || stockStatus(p) === status) &&
         (!q || [p.name, p.sku, p.supplier, p.location].some((f) => f.toLowerCase().includes(q))),
     )
-  }, [inv.products, query, category, status])
+  }, [inv.products, query, category])
+
+  const visible = status === 'all' ? scoped : scoped.filter((p) => stockStatus(p) === status)
 
   const isFiltered = query !== '' || category !== 'all' || status !== 'all'
 
@@ -46,9 +48,7 @@ export function Dashboard() {
       <header className="page__header">
         <div>
           <h1>Inventory</h1>
-          <p className="page__sub">
-            {inv.products.length} products · {formatNumber(units)} units · {formatCurrency(value)} at cost
-          </p>
+          <p className="page__sub">Stock levels and reorder alerts across all locations</p>
         </div>
         <div className="page__actions">
           <button type="button" className="btn btn--ghost" onClick={inv.resetData}>
@@ -91,6 +91,14 @@ export function Dashboard() {
         )}
       </div>
 
+      <StatTiles products={scoped} />
+
+      <section className="card">
+        <h2 className="card__title">Reorder alerts</h2>
+        <p className="card__sub">Products at or below their reorder point</p>
+        <LowStockList products={scoped} onRestock={(product) => setDialog({ kind: 'adjust', product })} />
+      </section>
+
       <section className="card">
         <h2 className="card__title">Products</h2>
         <p className="card__sub">
@@ -99,6 +107,7 @@ export function Dashboard() {
         <InventoryTable
           products={visible}
           onEdit={(product) => setDialog({ kind: 'edit', product })}
+          onAdjust={(product) => setDialog({ kind: 'adjust', product })}
           onDelete={handleDelete}
         />
       </section>
@@ -117,6 +126,13 @@ export function Dashboard() {
           categories={categories}
           existingSkus={inv.products.map((p) => p.sku)}
           onSave={(input) => inv.updateProduct(dialog.product.id, input)}
+          onClose={() => setDialog(null)}
+        />
+      )}
+      {dialog?.kind === 'adjust' && (
+        <StockDialog
+          product={dialog.product}
+          onAdjust={(delta) => inv.adjustStock(dialog.product.id, delta)}
           onClose={() => setDialog(null)}
         />
       )}

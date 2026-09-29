@@ -1,9 +1,18 @@
 import type { Product, StockStatus } from '../types/inventory'
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+const compactCurrency = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+const wholeCurrency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 const number = new Intl.NumberFormat('en-US')
 
 export const formatCurrency = (n: number) => currency.format(n)
+export const formatCompactCurrency = (n: number) =>
+  Math.abs(n) >= 10_000 ? compactCurrency.format(n) : wholeCurrency.format(n)
 export const formatNumber = (n: number) => number.format(n)
 
 export function stockStatus(p: Product): StockStatus {

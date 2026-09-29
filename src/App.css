@@ -49,6 +49,10 @@
   background: var(--accent);
   filter: brightness(1.08);
 }
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .btn--ghost {
   background: transparent;
   border-color: transparent;
@@ -108,6 +112,88 @@ button:focus-visible {
   color: var(--muted);
 }
 
+/* ---------- Summary tiles ---------- */
+.tiles {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  min-width: 0;
+}
+.tile__label {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.tile__hero {
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 6px 0 4px;
+}
+.tile__value {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 6px 0 4px;
+}
+.tile__sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------- Reorder alerts ---------- */
+.alerts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.alert {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--grid);
+}
+.alert:first-child {
+  border-top: 0;
+}
+.alert__main {
+  flex: 1;
+  min-width: 0;
+}
+.alert__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.meter {
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+  max-width: 260px;
+}
+.meter__fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.meter--low .meter__fill {
+  background: var(--warning);
+}
+.meter--out .meter__fill {
+  background: var(--critical);
+}
+
 /* ---------- Status ---------- */
 .status {
   display: inline-flex;
@@ -136,6 +222,9 @@ button:focus-visible {
 }
 .status--out .status__icon {
   background: var(--critical);
+}
+.status--inline {
+  margin-right: 8px;
 }
 
 /* ---------- Table ---------- */
@@ -248,4 +337,30 @@ button:focus-visible {
 .form__error {
   margin: 0;
   color: var(--critical-ink);
+}
+.form__hint {
+  margin: 0;
+  color: var(--ink-2);
+}
+.segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.segmented button {
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.segmented button.is-active {
+  background: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
 }

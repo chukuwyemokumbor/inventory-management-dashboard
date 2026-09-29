@@ -19,10 +19,11 @@ const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
 interface Props {
   products: Product[]
   onEdit: (p: Product) => void
+  onAdjust: (p: Product) => void
   onDelete: (p: Product) => void
 }
 
-export function InventoryTable({ products, onEdit, onDelete }: Props) {
+export function InventoryTable({ products, onEdit, onAdjust, onDelete }: Props) {
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'status', dir: 1 })
 
   const sorted = [...products].sort((a, b) => {
@@ -91,6 +92,9 @@ export function InventoryTable({ products, onEdit, onDelete }: Props) {
                 <StatusBadge status={stockStatus(p)} />
               </td>
               <td className="actions">
+                <button type="button" className="btn btn--small" onClick={() => onAdjust(p)}>
+                  Adjust
+                </button>
                 <button type="button" className="btn btn--small btn--ghost" onClick={() => onEdit(p)}>
                   Edit
                 </button>
