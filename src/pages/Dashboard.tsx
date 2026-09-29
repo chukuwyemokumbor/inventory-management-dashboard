@@ -1,5 +1,6 @@
 import { useInventory } from '../data/useInventory'
 import { formatCurrency, formatNumber } from '../data/format'
+import { InventoryTable } from '../components/InventoryTable'
 
 export function Dashboard() {
   const inv = useInventory()
@@ -19,6 +20,11 @@ export function Dashboard() {
           Reset sample data
         </button>
       </header>
+
+      <section className="card">
+        <h2 className="card__title">Products</h2>
+        <InventoryTable products={inv.products} />
+      </section>
     </div>
   )
 }
